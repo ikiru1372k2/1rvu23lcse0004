@@ -1,61 +1,57 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
+const shorturlRoutes = require('./routes/shorturls');
 
-// Load environment variables
-dotenv.config();
+const LoggingMiddleware = require('../Logging-Middleware/logging-middleware');
+const config = require('../Logging-Middleware/config');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 8080;
 
-// Middleware
+const logger = new LoggingMiddleware(config.ACCESS_TOKEN);
+
 app.use(cors());
 app.use(express.json());
 
-// Health check
-app.get('/health', (req, res) => {
+app.use(async (req, res, next) => {
+  await logger.info('backend', 'middleware', `${req.method} ${req.path} - Request received`);
+  next();
+});
+
+app.use('/', shorturlRoutes);
+
+app.get('/', async (req, res) => {
+  await logger.info('backend', 'controller', 'Health check endpoint accessed');
   res.json({ 
-    status: 'OK', 
-    timestamp: new Date(),
-    port: PORT 
+    message: 'URL Shortener Service is running!',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Test route
-app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'Backend is working !',
-    frontend: 'http://localhost:3000'
+app.use(async (error, req, res, next) => {
+  await logger.error('backend', 'handler', `Unhandled error: ${error.message}`);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: 'Something went wrong on our end'
   });
 });
 
-// TODO: Add your routes here
-// Example structure:
-// app.use('/api/products', require('./routes/products'));
-// app.use('/api/categories', require('./routes/categories'));
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: err.message 
-  });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ 
+app.use(async (req, res) => {
+  await logger.warn('backend', 'handler', `404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({
     error: 'Route not found',
-    path: req.path 
+    message: `Cannot ${req.method} ${req.path}`
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`
-Server is running!
-Listening on port ${PORT}
-Health check: http://localhost:${PORT}/health
-API Test: http://localhost:${PORT}/api/test
-  `);
+app.listen(PORT, async () => {
+  await logger.info('backend', 'service', `URL Shortener server started on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📝 API Documentation:`);
+  console.log(`   POST http://localhost:${PORT}/shorturls - Create short URL`);
+  console.log(`   GET  http://localhost:${PORT}/shorturls/:shortcode - Get statistics`);
+  console.log(`   GET  http://localhost:${PORT}/:shortcode - Redirect to original URL`);
 });
+
+module.exports = app;
