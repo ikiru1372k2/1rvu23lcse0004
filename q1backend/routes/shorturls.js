@@ -10,8 +10,8 @@ const { isValidUrl } = require('../utils/url-validator');
 const { saveUrl, getUrlByShortcode, incrementClickCount, getUrlStats } = require('../data/urls');
 
 // Import logging middleware
-const LoggingMiddleware = require('../../Logging-Middleware/logging-middleware');
-const config = require('../../Logging-Middleware/config');
+const LoggingMiddleware = require('../../LogMiddleware/logging-middleware');
+const config = require('../../LogMiddleware/config');
 const logger = new LoggingMiddleware(config.ACCESS_TOKEN);
 
 // POST /shorturls - Create a shortened URL

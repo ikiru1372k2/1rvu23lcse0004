@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const shorturlRoutes = require('./routes/shorturls');
 
-const LoggingMiddleware = require('../Logging-Middleware/logging-middleware');
-const config = require('../Logging-Middleware/config');
+const LoggingMiddleware = require('../LogMiddleware/logging-middleware');
+const config = require('../LogMiddleware/config');
 
 const app = express();
 const PORT = 8080;
@@ -47,11 +47,11 @@ app.use(async (req, res) => {
 
 app.listen(PORT, async () => {
   await logger.info('backend', 'service', `URL Shortener server started on port ${PORT}`);
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📝 API Documentation:`);
-  console.log(`   POST http://localhost:${PORT}/shorturls - Create short URL`);
-  console.log(`   GET  http://localhost:${PORT}/shorturls/:shortcode - Get statistics`);
-  console.log(`   GET  http://localhost:${PORT}/:shortcode - Redirect to original URL`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`API Documentation:`);
+  console.log(` POST http://localhost:${PORT}/shorturls - Create short URL`);
+  console.log(` GET  http://localhost:${PORT}/shorturls/:shortcode - Get statistics`);
+  console.log(` GET  http://localhost:${PORT}/:shortcode - Redirect to original URL`);
 });
 
 module.exports = app;

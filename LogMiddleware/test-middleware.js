@@ -5,7 +5,7 @@ async function testMiddleware() {
   console.log('🧪 Testing Logging Middleware...\n');
 
   if (config.ACCESS_TOKEN === 'YOUR_ACCESS_TOKEN_HERE') {
-    console.error('❌ Please update ACCESS_TOKEN in config.js first!');
+    console.error(' Please update ACCESS_TOKEN in config.js first!');
     return;
   }
 
@@ -30,7 +30,7 @@ async function testMiddleware() {
   console.log('Test 5: Warning log');
   await logger.warn('backend', 'auth', 'Authentication warning test');
 
-  console.log('\n✅ All tests completed!');
+  console.log('\n All tests completed!');
 }
 
 function sleep(ms) {
